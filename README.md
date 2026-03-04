@@ -1,23 +1,25 @@
-# n8n-nodes-teletype
+# n8n-nodes-teletype-app
 **Teletype Public API → n8n Community Nodes**
 
-Набор кастомных нод для **n8n**, который подключает **Teletype Public API**: действия (Actions) и триггеры (Triggers) для работы с клиентами/диалогами/сообщениями/каналами и т.д.
+Набор нод для **n8n**, который подключает **Teletype Public API**: действия (Actions) и триггеры (Triggers) для работы с клиентами/диалогами/сообщениями/каналами.
 
 ---
 
-## Что вы получите
+## Что умеет
 
 - ✅ **Actions**: операции Teletype API в виде нод n8n
-- 🔔 **Trigger**: приём событий из Teletype по Webhook URL (если Trigger включён в сборке)
+- 🔔 **Trigger**: принимает события из Teletype по Webhook URL
 - 🧩 Установка как **Community Nodes**
-- 🌍 UI в n8n — **на английском**, а подсказки/описания — **на русском**
+- 📝 Подсказки/описания в нодах — на русском
 
 ---
 
-## Требования
+## Требования (простыми словами)
 
-- Self-hosted n8n (Community Nodes доступны в self-hosted установках)
-- Доступ к проекту Teletype и **API Token**
+- Вам нужен **n8n, который установлен у вас/в вашей компании** (обычно это n8n на сервере или в Docker).
+- Вам нужен доступ к **проекту Teletype** и его **API Token**.
+
+> Если у вас нет доступа к настройкам n8n — попросите администратора установить Community Nodes.
 
 ---
 
@@ -29,41 +31,58 @@
 4. Подтвердите установку
 5. Перезапустите n8n (если попросит)
 
+📸 Скрин:
+![Установка Community Nodes](docs/images/01-community-nodes-install.png)
+
 ---
 
-## Авторизация (Credentials)
+## Настройка в Teletype (API Token + Webhook + события)
 
-Teletype Public API использует **токен проекта** (API Token).
+В Teletype вам нужно:
+1) взять **API Token** проекта
+2) указать **Webhook URL** (для событий)
+3) включить **нужные события** (галочки)
 
-Teletype принимает токен двумя способами:
+📸 Скрин (в одном месте видно всё: Public API, токен, webhook и события):
+![Public API / Token / Webhook / Events](docs/images/02-teletype-public-api-webhook-events.png)
 
-- Заголовком:
-  `X-Auth-Token: <ACCESS_TOKEN>`
+---
 
-- Или query-параметром:
-  `?token=<ACCESS_TOKEN>`
+## Авторизация в n8n (Credentials)
 
-Создание credentials в n8n:
-1. Внутри ноды откройте **Credentials**
-2. Создайте/выберите credential для Teletype
-3. Вставьте токен и сохраните
+1. Внутри любой ноды Teletype откройте **Credentials**
+2. Нажмите **Create new**
+3. Выберите **Teletype API**
+4. Вставьте **API Token** и сохраните
+
+📸 Скрин:
+![Создание Credentials Teletype](docs/images/03-n8n-credentials.png)
 
 ---
 
 ## Webhooks / Events (важно)
 
 В Teletype **все события отправляются на один Webhook URL**.
-В документации события могут быть показаны как разные эндпоинты, но фактически URL один — различается содержимое события.
 
 ---
 
 ## Быстрый старт
 
+### 1) Проверка Actions (без триггера)
 1. Создайте credential **Teletype API**
 2. Добавьте ноду **Teletype**
-3. Выберите **Resource** и **Operation**
-4. Заполните параметры (описания полей подскажут, что требуется)
-5. Запустите workflow
+3. Выберите нужный **Resource** и **Operation**
+4. Запустите workflow
+
+---
+
+### 2) Подключение Trigger (получение событий из Teletype)
+
+1. В n8n добавьте **Teletype Trigger**
+2. Скопируйте Webhook URL из ноды Trigger
+3. Вставьте Webhook URL в Teletype (см. скрин “Public API / Token / Webhook / Events”)
+4. В Teletype включите нужные события (галочки)
+5. Запустите workflow и отправьте тестовое событие (например, сообщение в чат)
 
 ---
 
@@ -71,12 +90,19 @@ Teletype принимает токен двумя способами:
 
 ### Ноды не появились после установки
 - Перезапустите n8n
-- Убедитесь, что у n8n есть постоянный volume для `~/.n8n`
-- Проверьте логи n8n на ошибки загрузки community nodes
-
-### Trigger не ловит события
-- Проверьте, что Webhook URL настроен в Teletype
-- Убедитесь, что URL доступен из интернета (HTTPS, без авторизации на уровне прокси)
-- Проверьте входящие запросы в Execution logs n8n
+- Проверьте, что установка community nodes разрешена в вашей сборке
+- Посмотрите логи n8n: иногда там видно причину, почему пакет не загрузился
 
 ---
+
+### Trigger не ловит события
+
+Проверьте по шагам:
+
+1. **Webhook URL настроен в Teletype** (вставлен правильный адрес из Teletype Trigger)
+2. **В Teletype включены нужные события** (поставлены галочки на те события, которые вы ждёте)
+3. URL **доступен из интернета**:
+	- HTTPS
+	- без авторизации на уровне прокси / basic-auth
+	- без блокировок firewall
+4. Откройте **Executions** в n8n и проверьте, приходят ли запросы на webhook

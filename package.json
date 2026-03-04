@@ -1,17 +1,25 @@
 {
-	"name": "n8n-nodes-teletype",
+	"name": "n8n-nodes-teletype-app",
 	"version": "0.1.0",
 	"description": "Teletype Public API community nodes for n8n.",
 	"license": "MIT",
 	"homepage": "https://teletype.app/",
-	"keywords": ["n8n-community-node-package", "teletype", "api", "crm", "support", "chat"],
+	"keywords": [
+		"n8n-community-node-package",
+		"teletype",
+		"teletype-app",
+		"api",
+		"crm",
+		"support",
+		"chat"
+	],
 	"author": {
 		"name": "Teletype",
 		"email": "p@teletype.app"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://gitlab.com/sanadreas123/n8n-nodes-teletype.git"
+		"url": "https://github.com/Teletype-App/n8n-nodes-teletype-app.git"
 	},
 	"scripts": {
 		"build": "n8n-node build",
