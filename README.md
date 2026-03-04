@@ -31,8 +31,7 @@
 4. Подтвердите установку
 5. Перезапустите n8n (если попросит)
 
-📸 Скрин:
-![Установка Community Nodes](docs/images/01-community-nodes-install.png)
+![Установка Community Nodes](https://raw.githubusercontent.com/Teletype-App/n8n-nodes-teletype-app/main/docs/images/01-community-nodes-install.png)
 
 ---
 
@@ -43,8 +42,7 @@
 2) указать **Webhook URL** (для событий)
 3) включить **нужные события** (галочки)
 
-📸 Скрин (в одном месте видно всё: Public API, токен, webhook и события):
-![Public API / Token / Webhook / Events](docs/images/02-teletype-public-api-webhook-events.png)
+![Public API / Token / Webhook / Events](https://raw.githubusercontent.com/Teletype-App/n8n-nodes-teletype-app/main/docs/images/02-teletype-public-api-webhook-events.png)
 
 ---
 
@@ -55,8 +53,7 @@
 3. Выберите **Teletype API**
 4. Вставьте **API Token** и сохраните
 
-📸 Скрин:
-![Создание Credentials Teletype](docs/images/03-n8n-credentials.png)
+![Создание Credentials Teletype](https://raw.githubusercontent.com/Teletype-App/n8n-nodes-teletype-app/main/docs/images/03-n8n-credentials.png)
 
 ---
 
