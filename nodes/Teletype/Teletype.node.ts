@@ -11,7 +11,7 @@ import { clientsDescription } from './resources/clients';
 import { dialogsDescription } from './resources/dialogs';
 import { messagesDescription } from './resources/messages';
 import { channelsDescription } from './resources/channels';
-import { tagOperationsDescription, tagFieldsDescription } from './resources/Tag';
+import { tagOperationsDescription, tagFieldsDescription } from './resources/tag';
 import { categoriesDescription } from './resources/categories';
 import { notesDescription } from './resources/notes';
 import { templatesDescription } from './resources/templates';
@@ -28,7 +28,7 @@ export class Teletype implements INodeType {
 		group: ['input'],
 		version: 1,
 		subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
-		description: 'Work with Teletype Public API',
+		description: 'Работа с Teletype Public API',
 		defaults: {
 			name: 'Teletype',
 		},
@@ -55,15 +55,15 @@ export class Teletype implements INodeType {
 				type: 'options',
 				noDataExpression: true,
 				options: [
+					{ name: 'Category', value: 'category' },
+					{ name: 'Channel', value: 'channel' },
 					{ name: 'Client', value: 'client' },
 					{ name: 'Dialog', value: 'dialog' },
 					{ name: 'Message', value: 'message' },
-					{ name: 'Channel', value: 'channel' },
-					{ name: 'Tag', value: 'tag' },
-					{ name: 'Category', value: 'category' },
 					{ name: 'Note', value: 'note' },
-					{ name: 'Template', value: 'template' },
 					{ name: 'Project', value: 'project' },
+					{ name: 'Tag', value: 'tag' },
+					{ name: 'Template', value: 'template' },
 				],
 				default: 'client',
 			},

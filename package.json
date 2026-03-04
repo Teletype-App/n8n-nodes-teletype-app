@@ -32,7 +32,8 @@
 			"dist/credentials/TeletypeApi.credentials.js"
 		],
 		"nodes": [
-			"dist/nodes/Teletype/Teletype.node.js"
+			"dist/nodes/Teletype/Teletype.node.js",
+			"dist/nodes/TeletypeTrigger/TeletypeTrigger.node.js"
 		]
 	},
 	"devDependencies": {
