@@ -22,7 +22,7 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export class Teletype implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Teletype',
+		displayName: 'Teletype App',
 		name: 'teletype',
 		icon: 'file:../../icons/teletype.svg',
 		group: ['input'],
@@ -30,7 +30,7 @@ export class Teletype implements INodeType {
 		subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
 		description: 'Работа с Teletype Public API',
 		defaults: {
-			name: 'Teletype',
+			name: 'Teletype App',
 		},
 		usableAsTool: true,
 		inputs: [NodeConnectionTypes.Main],

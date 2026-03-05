@@ -54,13 +54,13 @@ function toGenericValue(value: unknown): GenericValue {
 
 export class TeletypeTrigger implements INodeType {
 	description: INodeTypeDescription = {
-		displayName: 'Teletype Trigger',
+		displayName: 'Teletype App Trigger',
 		name: 'teletypeTrigger',
 		icon: 'file:../../icons/teletype.svg',
 		group: ['trigger'],
 		version: 1,
 		description: 'Запускается при получении webhook от Teletype',
-		defaults: { name: 'Teletype Trigger' },
+		defaults: { name: 'Teletype App Trigger' },
 		usableAsTool: true,
 		inputs: [],
 		outputs: [NodeConnectionTypes.Main],
