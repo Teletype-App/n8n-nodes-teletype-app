@@ -13,7 +13,7 @@ export const notesDescription: INodeProperties[] = [
 			{
 				name: 'List',
 				value: 'list',
-				description: 'Получить список заметок клиента',
+				description: 'Получить список заметок о клиенте',
 				action: 'List notes',
 			},
 			{

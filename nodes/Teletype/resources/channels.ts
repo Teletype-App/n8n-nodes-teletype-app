@@ -12,7 +12,7 @@ export const channelsDescription: INodeProperties[] = [
 				name: 'List',
 				value: 'list',
 				action: 'List channels',
-				description: 'Получить список каналов проекта',
+				description: 'Получить список каналов в проекте',
 			},
 			{
 				name: 'Send Message',
@@ -55,7 +55,7 @@ export const channelsDescription: INodeProperties[] = [
 		name: 'onlyActive',
 		type: 'boolean',
 		default: true,
-		description: 'Whether to return only active channels (возвращать только активные каналы)',
+		description: 'Следует ли возвращать только активные каналы',
 		displayOptions: { show: { resource: ['channel'], operation: ['list'] } },
 	},
 	{
@@ -81,7 +81,8 @@ export const channelsDescription: INodeProperties[] = [
 		name: 'autoClose',
 		type: 'boolean',
 		default: false,
-		description: 'Whether to close the dialog after sending the message (закрывать диалог после отправки)',
+		description:
+			'Следует ли закрывать диалоговое окно после отправки сообщения',
 		displayOptions: { show: { resource: ['channel'], operation: ['sendMessage'] } },
 	},
 	{

@@ -27,7 +27,7 @@ export const projectDescription: INodeProperties[] = [
 			{
 				name: 'Get API Status',
 				value: 'getApiStatus',
-				description: 'Получить информацию о статусе Public API проекта',
+				description: 'Получить информацию о статусе Public API в проекте',
 				action: 'Get API status',
 			},
 			{

@@ -59,7 +59,7 @@ export class TeletypeTrigger implements INodeType {
 		icon: 'file:../../icons/teletype.svg',
 		group: ['trigger'],
 		version: 1,
-		description: 'Запускается при получении webhook от Teletype',
+		description: 'Инструмент для работы с Public API Teletype App',
 		defaults: { name: 'Teletype App Trigger' },
 		usableAsTool: true,
 		inputs: [],
@@ -93,21 +93,24 @@ export class TeletypeTrigger implements INodeType {
 				name: 'includeHeaders',
 				type: 'boolean',
 				default: false,
-				description: 'Whether to include HTTP headers in the output item (добавлять HTTP-заголовки в выходные данные)',
+				description:
+					'Whether to include HTTP headers in the output item (добавлять HTTP-заголовки в выходные данные)',
 			},
 			{
 				displayName: 'Include Query',
 				name: 'includeQuery',
 				type: 'boolean',
 				default: false,
-				description: 'Whether to include query parameters in the output item (добавлять query-параметры в выходные данные)',
+				description:
+					'Whether to include query parameters in the output item (добавлять query-параметры в выходные данные)',
 			},
 			{
 				displayName: 'Strict Event Field',
 				name: 'strictEventField',
 				type: 'boolean',
 				default: true,
-				description: 'Whether to throw an error if the incoming webhook has no name field (выдавать ошибку, если нет поля name)',
+				description:
+					'Whether to throw an error if the incoming webhook has no name field (выдавать ошибку, если нет поля name)',
 			},
 		],
 	};
@@ -120,10 +123,9 @@ export class TeletypeTrigger implements INodeType {
 		const strictEventField = this.getNodeParameter('strictEventField', 0) as boolean;
 
 		const bodyUnknown = this.getBodyData() ?? {};
-		const body = (bodyUnknown && typeof bodyUnknown === 'object' ? (bodyUnknown as Record<string, unknown>) : {}) as Record<
-			string,
-			unknown
-		>;
+		const body = (
+			bodyUnknown && typeof bodyUnknown === 'object' ? (bodyUnknown as Record<string, unknown>) : {}
+		) as Record<string, unknown>;
 
 		const name = (body.name ?? body.event ?? body.type) as string | undefined;
 		let payload: unknown = body.payload;

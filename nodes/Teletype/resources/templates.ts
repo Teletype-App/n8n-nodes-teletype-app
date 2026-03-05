@@ -13,7 +13,7 @@ export const templatesDescription: INodeProperties[] = [
 			{
 				name: 'List',
 				value: 'list',
-				description: 'Получить шаблоны быстрых ответов в проекте',
+				description: 'Получить список шаблонов быстрых ответов в проекте',
 				action: 'List templates',
 			},
 			{

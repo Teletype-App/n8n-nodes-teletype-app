@@ -28,7 +28,7 @@ export class Teletype implements INodeType {
 		group: ['input'],
 		version: 1,
 		subtitle: '={{$parameter["resource"] + ": " + $parameter["operation"]}}',
-		description: 'Работа с Teletype Public API',
+		description: 'Инструмент для работы с Public API Teletype App',
 		defaults: {
 			name: 'Teletype App',
 		},
@@ -117,12 +117,16 @@ export class Teletype implements INodeType {
 								if (clientIdFilter) pageQs.clientId = clientIdFilter;
 								if (clientPhone) pageQs.clientPhone = clientPhone;
 
-								const resp = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-									method: 'GET',
-									url,
-									qs: pageQs,
-									json: true,
-								});
+								const resp = await this.helpers.httpRequestWithAuthentication.call(
+									this,
+									'teletypeApi',
+									{
+										method: 'GET',
+										url,
+										qs: pageQs,
+										json: true,
+									},
+								);
 
 								// Ожидаем массив. Если API вернёт объект с полем data/items — скажешь, и я подстрою.
 								const data = Array.isArray(resp) ? resp : (resp?.data ?? resp?.items);
@@ -144,9 +148,7 @@ export class Teletype implements INodeType {
 
 						if (clientIdFilter) qs.clientId = clientIdFilter;
 						if (clientPhone) qs.clientPhone = clientPhone;
-					}
-
-					else if (operation === 'getLastDialog') {
+					} else if (operation === 'getLastDialog') {
 						method = 'GET';
 						url = `${baseUrl}/client/dialog`;
 
@@ -157,15 +159,11 @@ export class Teletype implements INodeType {
 						qs = { clientId };
 						if (channelId) qs.channelId = channelId;
 						if (channelType) qs.channelType = channelType;
-					}
-
-					else if (operation === 'getDetails') {
+					} else if (operation === 'getDetails') {
 						method = 'GET';
 						const clientId = this.getNodeParameter('clientId', i) as string;
 						url = `${baseUrl}/client/details/${encodeURIComponent(clientId)}`;
-					}
-
-					else if (operation === 'update') {
+					} else if (operation === 'update') {
 						method = 'POST';
 						const clientId = this.getNodeParameter('clientId', i) as string;
 						url = `${baseUrl}/client/update/${encodeURIComponent(clientId)}`;
@@ -174,7 +172,10 @@ export class Teletype implements INodeType {
 						const phone = this.getNodeParameter('phone', i) as string;
 						const email = this.getNodeParameter('email', i) as string;
 						const additionalPayloadRaw = this.getNodeParameter('additionalPayload', i) as unknown;
-						const forceAdditionalPayload = this.getNodeParameter('forceAdditionalPayload', i) as boolean;
+						const forceAdditionalPayload = this.getNodeParameter(
+							'forceAdditionalPayload',
+							i,
+						) as boolean;
 
 						const form: Record<string, string> = {};
 						if (name) form.name = name;
@@ -190,27 +191,27 @@ export class Teletype implements INodeType {
 							}
 						}
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method,
-							url,
-							form,
-							headers: {
-								'Content-Type': 'application/x-www-form-urlencoded',
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method,
+								url,
+								form,
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
+								json: true,
 							},
-							json: true,
-						});
+						);
 
 						returnData.push({ json: response });
 						continue;
-					}
-
-					else if (operation === 'getCustomFields') {
+					} else if (operation === 'getCustomFields') {
 						method = 'GET';
 						const clientId = this.getNodeParameter('clientId', i) as string;
 						url = `${baseUrl}/client/get-custom-fields/${encodeURIComponent(clientId)}`;
-					}
-
-					else if (operation === 'setCustomFields') {
+					} else if (operation === 'setCustomFields') {
 						method = 'POST';
 						const clientId = this.getNodeParameter('clientId', i) as string;
 						url = `${baseUrl}/client/set-custom-fields/${encodeURIComponent(clientId)}`;
@@ -225,21 +226,26 @@ export class Teletype implements INodeType {
 							payload[`values[${row.key}]`] = row.value ?? '';
 						}
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method,
-							url,
-							body: payload,
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method,
+								url,
+								body: payload,
+								json: true,
+							},
+						);
 
 						returnData.push({ json: response });
 						continue;
+					} else {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Unknown client operation "${operation}".`,
+							{ itemIndex: i },
+						);
 					}
-
-					else {
-						throw new NodeOperationError(this.getNode(), `Unknown client operation "${operation}".`, { itemIndex: i });
-					}
-
 				} else if (resource === 'dialog') {
 					if (operation === 'list') {
 						method = 'GET';
@@ -254,52 +260,44 @@ export class Teletype implements INodeType {
 						qs = { page, pageSize, status };
 						if (channelId) qs.channelId = channelId;
 						if (channelType) qs.channelType = channelType;
-					}
-
-					else if (operation === 'getDetails') {
+					} else if (operation === 'getDetails') {
 						method = 'GET';
 						const dialogId = this.getNodeParameter('dialogId', i) as string;
 						url = `${baseUrl}/dialog/details/${encodeURIComponent(dialogId)}`;
-					}
-
-					else if (operation === 'getGroupClients') {
+					} else if (operation === 'getGroupClients') {
 						method = 'GET';
 						const dialogId = this.getNodeParameter('dialogId', i) as string;
 						url = `${baseUrl}/dialog/group-clients/${encodeURIComponent(dialogId)}`;
-					}
-
-					else if (operation === 'close') {
+					} else if (operation === 'close') {
 						method = 'POST';
 						const dialogId = this.getNodeParameter('dialogId', i) as string;
 						url = `${baseUrl}/dialog/close/${encodeURIComponent(dialogId)}`;
-					}
-
-					else if (operation === 'markSeen') {
+					} else if (operation === 'markSeen') {
 						method = 'GET';
 						const dialogId = this.getNodeParameter('dialogId', i) as string;
 						url = `${baseUrl}/dialog/seen/${encodeURIComponent(dialogId)}`;
-					}
-
-					else if (operation === 'setOperator') {
+					} else if (operation === 'setOperator') {
 						method = 'POST';
 						const dialogId = this.getNodeParameter('dialogId', i) as string;
 						const operatorId = this.getNodeParameter('operatorId', i) as string;
 
 						url = `${baseUrl}/dialog/set-operator/${encodeURIComponent(dialogId)}`;
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method,
-							url,
-							form: { operator_id: operatorId },
-							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method,
+								url,
+								form: { operator_id: operatorId },
+								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								json: true,
+							},
+						);
 
 						returnData.push({ json: response });
 						continue;
-					}
-
-					else if (operation === 'create') {
+					} else if (operation === 'create') {
 						method = 'POST';
 						url = `${baseUrl}/dialog/create`;
 
@@ -311,34 +309,35 @@ export class Teletype implements INodeType {
 						if (clientPhone) form.clientPhone = clientPhone;
 						if (clientEmail) form.clientEmail = clientEmail;
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method,
-							url,
-							form,
-							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method,
+								url,
+								form,
+								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								json: true,
+							},
+						);
 
 						returnData.push({ json: response });
 						continue;
-					}
-
-					else if (operation === 'markAnswered') {
+					} else if (operation === 'markAnswered') {
 						method = 'POST';
 						const dialogId = this.getNodeParameter('dialogId', i) as string;
 						url = `${baseUrl}/dialog/answered/${encodeURIComponent(dialogId)}`;
-					}
-
-					else if (operation === 'markUnanswered') {
+					} else if (operation === 'markUnanswered') {
 						method = 'POST';
 						const dialogId = this.getNodeParameter('dialogId', i) as string;
 						url = `${baseUrl}/dialog/unanswered/${encodeURIComponent(dialogId)}`;
+					} else {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Unknown dialog operation "${operation}".`,
+							{ itemIndex: i },
+						);
 					}
-
-					else {
-						throw new NodeOperationError(this.getNode(), `Unknown dialog operation "${operation}".`, { itemIndex: i });
-					}
-		
 				} else if (resource === 'message') {
 					if (operation === 'list') {
 						method = 'GET';
@@ -354,9 +353,7 @@ export class Teletype implements INodeType {
 						if (dialogId) qs.dialogId = dialogId;
 						if (channelId) qs.channelId = channelId;
 						if (clientId) qs.clientId = clientId;
-					}
-
-					else if (operation === 'send') {
+					} else if (operation === 'send') {
 						const dialogId = this.getNodeParameter('dialogId', i) as string;
 						const text = this.getNodeParameter('text', i) as string;
 						const attachmentMode = this.getNodeParameter('attachmentMode', i) as string;
@@ -407,19 +404,25 @@ export class Teletype implements INodeType {
 							};
 						}
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method,
-							url,
-							formData,
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method,
+								url,
+								formData,
+								json: true,
+							},
+						);
 
 						returnData.push({ json: response });
 						continue;
-					}
-
-					else {
-						throw new NodeOperationError(this.getNode(), `Unknown message operation "${operation}".`, { itemIndex: i });
+					} else {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Unknown message operation "${operation}".`,
+							{ itemIndex: i },
+						);
 					}
 				} else if (resource === 'channel') {
 					if (operation === 'list') {
@@ -433,9 +436,7 @@ export class Teletype implements INodeType {
 
 						qs = { page, pageSize, onlyActive };
 						if (channelType) qs.channelType = channelType;
-					}
-
-					else if (operation === 'sendMessage') {
+					} else if (operation === 'sendMessage') {
 						method = 'POST';
 						url = `${baseUrl}/channel/send-message`;
 
@@ -497,27 +498,31 @@ export class Teletype implements INodeType {
 							};
 						}
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method,
-							url,
-							formData,
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method,
+								url,
+								formData,
+								json: true,
+							},
+						);
 
 						returnData.push({ json: response });
 						continue;
-					}
-
-					else {
-						throw new NodeOperationError(this.getNode(), `Unknown channel operation "${operation}".`, { itemIndex: i });
+					} else {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Unknown channel operation "${operation}".`,
+							{ itemIndex: i },
+						);
 					}
 				} else if (resource === 'tag') {
 					if (operation === 'list') {
 						method = 'GET';
 						url = `${baseUrl}/tag/list`;
-					}
-
-					else if (operation === 'addToClient' || operation === 'removeFromClient') {
+					} else if (operation === 'addToClient' || operation === 'removeFromClient') {
 						method = 'POST';
 
 						const clientId = this.getNodeParameter('clientId', i) as string;
@@ -528,28 +533,30 @@ export class Teletype implements INodeType {
 								? `${baseUrl}/client/add-tag/${encodeURIComponent(clientId)}`
 								: `${baseUrl}/client/remove-tag/${encodeURIComponent(clientId)}`;
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method, // <- HttpMethod union, ок
-							url,
-							form: { tag_id: tagId },
-							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method, // <- HttpMethod union, ок
+								url,
+								form: { tag_id: tagId },
+								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								json: true,
+							},
+						);
 
 						returnData.push({ json: response });
 						continue;
-					}
-
-					else {
-						throw new NodeOperationError(this.getNode(), `Unknown tag operation "${operation}".`, { itemIndex: i });
+					} else {
+						throw new NodeOperationError(this.getNode(), `Unknown tag operation "${operation}".`, {
+							itemIndex: i,
+						});
 					}
 				} else if (resource === 'category') {
 					if (operation === 'list') {
 						method = 'GET';
 						url = `${baseUrl}/appeal-categories/list`;
-					}
-
-					else if (operation === 'setForDialog') {
+					} else if (operation === 'setForDialog') {
 						method = 'POST';
 
 						const dialogId = this.getNodeParameter('dialogId', i) as string;
@@ -557,29 +564,33 @@ export class Teletype implements INodeType {
 
 						url = `${baseUrl}/dialog/set-category/${encodeURIComponent(dialogId)}`;
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method, // <- твой HttpMethod union
-							url,
-							form: { category_appointed_id: categoryId },
-							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method, // <- твой HttpMethod union
+								url,
+								form: { category_appointed_id: categoryId },
+								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								json: true,
+							},
+						);
 
 						returnData.push({ json: response });
 						continue;
-					}
-
-					else {
-						throw new NodeOperationError(this.getNode(), `Unknown category operation "${operation}".`, { itemIndex: i });
+					} else {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Unknown category operation "${operation}".`,
+							{ itemIndex: i },
+						);
 					}
 				} else if (resource === 'note') {
 					if (operation === 'list') {
 						method = 'GET';
 						const clientId = this.getNodeParameter('clientId', i) as string;
 						url = `${baseUrl}/client/notes-list/${encodeURIComponent(clientId)}`;
-					}
-
-					else if (operation === 'create') {
+					} else if (operation === 'create') {
 						method = 'POST';
 
 						const clientId = this.getNodeParameter('clientId', i) as string;
@@ -587,68 +598,60 @@ export class Teletype implements INodeType {
 
 						url = `${baseUrl}/client/create-note/${encodeURIComponent(clientId)}`;
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method,
-							url,
-							form: { text },
-							headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method,
+								url,
+								form: { text },
+								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								json: true,
+							},
+						);
 
 						returnData.push({ json: response });
 						continue;
-					}
-
-					else if (operation === 'delete') {
+					} else if (operation === 'delete') {
 						method = 'GET';
 						const noteId = this.getNodeParameter('noteId', i) as string;
 						url = `${baseUrl}/client/delete-note/${encodeURIComponent(noteId)}`;
-					}
-
-					else {
-						throw new NodeOperationError(this.getNode(), `Unknown note operation "${operation}".`, { itemIndex: i });
+					} else {
+						throw new NodeOperationError(this.getNode(), `Unknown note operation "${operation}".`, {
+							itemIndex: i,
+						});
 					}
 				} else if (resource === 'template') {
 					if (operation === 'list') {
 						method = 'GET';
 						url = `${baseUrl}/template-message/list`;
-					}
-
-					else if (operation === 'listDirectories') {
+					} else if (operation === 'listDirectories') {
 						method = 'GET';
 						url = `${baseUrl}/template-message/directories`;
-					}
-
-					else {
-						throw new NodeOperationError(this.getNode(), `Unknown template operation "${operation}".`, { itemIndex: i });
+					} else {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Unknown template operation "${operation}".`,
+							{ itemIndex: i },
+						);
 					}
 				} else if (resource === 'project') {
 					if (operation === 'getBalance') {
 						method = 'GET';
 						url = `${baseUrl}/project/balance`;
-					}
-
-					else if (operation === 'getOperators') {
+					} else if (operation === 'getOperators') {
 						method = 'GET';
 						url = `${baseUrl}/project/operators`;
-					}
-
-					else if (operation === 'getApiStatus') {
+					} else if (operation === 'getApiStatus') {
 						method = 'GET';
 						url = `${baseUrl}/project/api-status`;
-					}
-
-					else if (operation === 'getDetails') {
+					} else if (operation === 'getDetails') {
 						method = 'GET';
 						url = `${baseUrl}/project/details`;
-					}
-
-					else if (operation === 'getTariff') {
+					} else if (operation === 'getTariff') {
 						method = 'GET';
 						url = `${baseUrl}/project/tariff`;
-					}
-
-					else if (operation === 'updatePublicApi') {
+					} else if (operation === 'updatePublicApi') {
 						method = 'POST';
 						url = `${baseUrl}/project/update-public-api`;
 
@@ -658,27 +661,34 @@ export class Teletype implements INodeType {
 						// По доке тело: application/json { active_webhooks: [], api_webhook: "..." }
 						// Можно отправлять частично (например только active_webhooks или только api_webhook)
 						const body: Record<string, unknown> = {};
-						if (Array.isArray(activeWebhooks) && activeWebhooks.length) body.active_webhooks = activeWebhooks;
+						if (Array.isArray(activeWebhooks) && activeWebhooks.length)
+							body.active_webhooks = activeWebhooks;
 						if (apiWebhook) body.api_webhook = apiWebhook;
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
-							method,
-							url,
-							body,
-							json: true,
-						});
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method,
+								url,
+								body,
+								json: true,
+							},
+						);
 
 						returnData.push({ json: response });
 						continue;
+					} else {
+						throw new NodeOperationError(
+							this.getNode(),
+							`Unknown project operation "${operation}".`,
+							{ itemIndex: i },
+						);
 					}
-
-					else {
-						throw new NodeOperationError(this.getNode(), `Unknown project operation "${operation}".`, { itemIndex: i });
-					}
-				}
-
-				else {
-					throw new NodeOperationError(this.getNode(), `Unknown resource "${resource}".`, { itemIndex: i });
+				} else {
+					throw new NodeOperationError(this.getNode(), `Unknown resource "${resource}".`, {
+						itemIndex: i,
+					});
 				}
 
 				const options = {
@@ -688,7 +698,11 @@ export class Teletype implements INodeType {
 					json: true,
 				};
 
-				const response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', options);
+				const response = await this.helpers.httpRequestWithAuthentication.call(
+					this,
+					'teletypeApi',
+					options,
+				);
 
 				returnData.push({ json: response });
 			} catch (error) {
