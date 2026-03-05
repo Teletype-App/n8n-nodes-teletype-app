@@ -17,7 +17,6 @@ import { notesDescription } from './resources/notes';
 import { templatesDescription } from './resources/templates';
 import { projectDescription } from './resources/project';
 
-
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export class Teletype implements INodeType {
@@ -394,6 +393,80 @@ export class Teletype implements INodeType {
 
 							const buffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
 
+							const bin = binary[binaryPropertyName];
+							const filename = bin.fileName || 'attachment';
+							const contentType = bin.mimeType || 'application/octet-stream';
+
+							formData.file = {
+								value: buffer,
+								options: { filename, contentType },
+							};
+						}
+
+						const response = await this.helpers.httpRequestWithAuthentication.call(
+							this,
+							'teletypeApi',
+							{
+								method,
+								url,
+								formData,
+								json: true,
+							},
+						);
+
+						returnData.push({ json: response });
+						continue;
+					} else if (operation === 'sendMessage') {
+						method = 'POST';
+						url = `${baseUrl}/channel/send-message`;
+
+						const channelId = this.getNodeParameter('sendChannelId', i) as string;
+						const text = this.getNodeParameter('text', i) as string;
+						const autoClose = this.getNodeParameter('autoClose', i) as boolean;
+						const recipientMode = this.getNodeParameter('recipientMode', i) as string;
+						const attachmentMode = this.getNodeParameter('attachmentMode', i) as string;
+						const repliedMessageId = this.getNodeParameter('repliedMessageId', i) as string;
+
+						const formData: Record<string, unknown> = {
+							channelId,
+							text,
+							autoClose,
+						};
+
+						if (repliedMessageId) {
+							formData.replied_message_id = repliedMessageId;
+						}
+
+						if (recipientMode === 'phone') {
+							const clientPhone = this.getNodeParameter('clientPhone', i) as string;
+							if (clientPhone) formData.clientPhone = clientPhone;
+						} else if (recipientMode === 'email') {
+							const clientEmail = this.getNodeParameter('clientEmail', i) as string;
+							if (clientEmail) formData.clientEmail = clientEmail;
+						} else if (recipientMode === 'username') {
+							const clientUsername = this.getNodeParameter('clientUsername', i) as string;
+							if (clientUsername) formData.clientUsername = clientUsername;
+						}
+
+						if (attachmentMode === 'url') {
+							const fileUrl = this.getNodeParameter('fileUrl', i) as string;
+							if (fileUrl) formData.url = fileUrl;
+						}
+
+						if (attachmentMode === 'binary') {
+							const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
+							const item = items[i];
+							const binary = item?.binary;
+
+							if (!binary || !binary[binaryPropertyName]) {
+								throw new NodeOperationError(
+									this.getNode(),
+									`Binary property "${binaryPropertyName}" is missing on item ${i}.`,
+									{ itemIndex: i },
+								);
+							}
+
+							const buffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
 							const bin = binary[binaryPropertyName];
 							const filename = bin.fileName || 'attachment';
 							const contentType = bin.mimeType || 'application/octet-stream';

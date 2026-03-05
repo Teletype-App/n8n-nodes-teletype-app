@@ -8,8 +8,24 @@ export const messagesDescription: INodeProperties[] = [
 		noDataExpression: true,
 		displayOptions: { show: { resource: ['message'] } },
 		options: [
-			{ name: 'List', value: 'list', action: 'List messages', description: 'Получить список сообщений' },
-			{ name: 'Send', value: 'send', action: 'Send message', description: 'Отправить сообщение в диалог' },
+			{
+				name: 'List',
+				value: 'list',
+				action: 'List messages',
+				description: 'Получить список сообщений',
+			},
+			{
+				name: 'Send to Dialog',
+				value: 'send',
+				action: 'Send message to dialog',
+				description: 'Отправить сообщение в диалог',
+			},
+			{
+				name: 'Send via Channel',
+				value: 'sendMessage',
+				action: 'Send message via channel',
+				description: 'Отправить сообщение через выбранный канал',
+			},
 		],
 		default: 'list',
 	},
@@ -65,13 +81,77 @@ export const messagesDescription: INodeProperties[] = [
 		displayOptions: { show: { resource: ['message'], operation: ['send'] } },
 	},
 	{
+		displayName: 'Channel ID',
+		name: 'sendChannelId',
+		type: 'string',
+		required: true,
+		default: '',
+		description: 'Идентификатор канала',
+		displayOptions: { show: { resource: ['message'], operation: ['sendMessage'] } },
+	},
+	{
+		displayName: 'Auto Close',
+		name: 'autoClose',
+		type: 'boolean',
+		default: false,
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
+		description: 'Следует ли закрывать диалоговое окно после отправки сообщения',
+		displayOptions: { show: { resource: ['message'], operation: ['sendMessage'] } },
+	},
+	{
+		displayName: 'Recipient',
+		name: 'recipientMode',
+		type: 'options',
+		options: [
+			{ name: 'Phone', value: 'phone' },
+			{ name: 'Email', value: 'email' },
+			{ name: 'Username', value: 'username' },
+		],
+		default: 'phone',
+		description: 'Как указать получателя сообщения',
+		displayOptions: { show: { resource: ['message'], operation: ['sendMessage'] } },
+	},
+	{
+		displayName: 'Client Phone',
+		name: 'clientPhone',
+		type: 'string',
+		default: '',
+		placeholder: '+79161234567',
+		description: 'Телефон клиента-получателя',
+		displayOptions: {
+			show: { resource: ['message'], operation: ['sendMessage'], recipientMode: ['phone'] },
+		},
+	},
+	{
+		displayName: 'Client Email',
+		name: 'clientEmail',
+		type: 'string',
+		default: '',
+		placeholder: 'client@example.com',
+		description: 'Email клиента-получателя',
+		displayOptions: {
+			show: { resource: ['message'], operation: ['sendMessage'], recipientMode: ['email'] },
+		},
+	},
+	{
+		displayName: 'Client Username',
+		name: 'clientUsername',
+		type: 'string',
+		default: '',
+		placeholder: 'someuser',
+		description: 'Username клиента-получателя',
+		displayOptions: {
+			show: { resource: ['message'], operation: ['sendMessage'], recipientMode: ['username'] },
+		},
+	},
+	{
 		displayName: 'Text',
 		name: 'text',
 		type: 'string',
 		required: true,
 		default: '',
 		description: 'Текст сообщения',
-		displayOptions: { show: { resource: ['message'], operation: ['send'] } },
+		displayOptions: { show: { resource: ['message'], operation: ['send', 'sendMessage'] } },
 	},
 	{
 		displayName: 'Attachment',
@@ -83,7 +163,7 @@ export const messagesDescription: INodeProperties[] = [
 			{ name: 'URL', value: 'url' },
 		],
 		default: 'none',
-		displayOptions: { show: { resource: ['message'], operation: ['send'] } },
+		displayOptions: { show: { resource: ['message'], operation: ['send', 'sendMessage'] } },
 		description: 'Отправить файл из binary-входа или по URL; в API файл имеет приоритет над URL',
 	},
 	{
@@ -93,7 +173,11 @@ export const messagesDescription: INodeProperties[] = [
 		default: 'data',
 		placeholder: 'data',
 		displayOptions: {
-			show: { resource: ['message'], operation: ['send'], attachmentMode: ['binary'] },
+			show: {
+				resource: ['message'],
+				operation: ['send', 'sendMessage'],
+				attachmentMode: ['binary'],
+			},
 		},
 		description: 'Имя binary-свойства во входном элементе',
 	},
@@ -105,7 +189,7 @@ export const messagesDescription: INodeProperties[] = [
 		placeholder: 'https://example.com/file.jpg',
 		description: 'URL файла для отправки',
 		displayOptions: {
-			show: { resource: ['message'], operation: ['send'], attachmentMode: ['url'] },
+			show: { resource: ['message'], operation: ['send', 'sendMessage'], attachmentMode: ['url'] },
 		},
 	},
 	{
@@ -113,7 +197,7 @@ export const messagesDescription: INodeProperties[] = [
 		name: 'repliedMessageId',
 		type: 'string',
 		default: '',
-		displayOptions: { show: { resource: ['message'], operation: ['send'] } },
+		displayOptions: { show: { resource: ['message'], operation: ['send', 'sendMessage'] } },
 		description: 'ID сообщения, на которое нужно ответить',
 	},
 ];
