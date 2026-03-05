@@ -56,7 +56,8 @@ export const clientsDescription: INodeProperties[] = [
 		name: 'returnAll',
 		type: 'boolean',
 		default: false,
-		description: 'Whether to return all results or only up to a given limit',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether, n8n-nodes-base/node-param-description-wrong-for-return-all
+		description: 'Возвращать все результаты или только заданное количество',
 		displayOptions: {
 			show: {
 				resource: ['client'],
@@ -73,7 +74,8 @@ export const clientsDescription: INodeProperties[] = [
 			minValue: 1,
 			maxValue: 500,
 		},
-		description: 'Max number of results to return',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-wrong-for-limit
+		description: 'Максимальное число результатов',
 		displayOptions: {
 			show: {
 				resource: ['client'],
@@ -240,7 +242,8 @@ export const clientsDescription: INodeProperties[] = [
 		name: 'forceAdditionalPayload',
 		type: 'boolean',
 		default: false,
-		description: 'Whether to overwrite existing additional client data (перезаписать существующие дополнительные данные)',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
+		description: 'Следует ли перезаписать существующие дополнительные данные клиента',
 		displayOptions: {
 			show: {
 				resource: ['client'],
