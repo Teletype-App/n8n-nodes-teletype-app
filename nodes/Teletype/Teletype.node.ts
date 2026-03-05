@@ -176,17 +176,17 @@ export class Teletype implements INodeType {
 							i,
 						) as boolean;
 
-						const form: Record<string, string> = {};
-						if (name) form.name = name;
-						if (phone) form.phone = phone;
-						if (email) form.email = email;
+						const formData: Record<string, string> = {};
+						if (name) formData.name = name;
+						if (phone) formData.phone = phone;
+						if (email) formData.email = email;
 
 						// additionalPayload приходит как объект (json param)
 						if (additionalPayloadRaw && typeof additionalPayloadRaw === 'object') {
 							const additionalPayload = additionalPayloadRaw as Record<string, unknown>;
 							if (Object.keys(additionalPayload).length > 0) {
-								form.additional_payload = JSON.stringify(additionalPayload);
-								form.force_additional_payload = forceAdditionalPayload ? '1' : '0';
+								formData.additional_payload = JSON.stringify(additionalPayload);
+								formData.force_additional_payload = forceAdditionalPayload ? '1' : '0';
 							}
 						}
 
@@ -196,10 +196,7 @@ export class Teletype implements INodeType {
 							{
 								method,
 								url,
-								form,
-								headers: {
-									'Content-Type': 'application/x-www-form-urlencoded',
-								},
+								formData,
 								json: true,
 							},
 						);
@@ -219,10 +216,10 @@ export class Teletype implements INodeType {
 							values?: Array<{ key: string; value: string }>;
 						};
 
-						const payload: Record<string, string> = {};
+						const formData: Record<string, string> = {};
 						for (const row of customFields.values ?? []) {
 							if (!row?.key) continue;
-							payload[`values[${row.key}]`] = row.value ?? '';
+							formData[`values[${row.key}]`] = row.value ?? '';
 						}
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(
@@ -231,7 +228,7 @@ export class Teletype implements INodeType {
 							{
 								method,
 								url,
-								body: payload,
+								formData,
 								json: true,
 							},
 						);
@@ -288,8 +285,7 @@ export class Teletype implements INodeType {
 							{
 								method,
 								url,
-								form: { operator_id: operatorId },
-								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								formData: { operator_id: operatorId },
 								json: true,
 							},
 						);
@@ -304,9 +300,9 @@ export class Teletype implements INodeType {
 						const clientPhone = this.getNodeParameter('createClientPhone', i) as string;
 						const clientEmail = this.getNodeParameter('createClientEmail', i) as string;
 
-						const form: Record<string, string> = { channelId };
-						if (clientPhone) form.clientPhone = clientPhone;
-						if (clientEmail) form.clientEmail = clientEmail;
+						const formData: Record<string, string> = { channelId };
+						if (clientPhone) formData.clientPhone = clientPhone;
+						if (clientEmail) formData.clientEmail = clientEmail;
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(
 							this,
@@ -314,8 +310,7 @@ export class Teletype implements INodeType {
 							{
 								method,
 								url,
-								form,
-								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								formData,
 								json: true,
 							},
 						);
@@ -612,8 +607,7 @@ export class Teletype implements INodeType {
 							{
 								method, // <- HttpMethod union, ок
 								url,
-								form: { tag_id: tagId },
-								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								formData: { tag_id: tagId },
 								json: true,
 							},
 						);
@@ -643,8 +637,7 @@ export class Teletype implements INodeType {
 							{
 								method, // <- твой HttpMethod union
 								url,
-								form: { category_appointed_id: categoryId },
-								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								formData: { category_appointed_id: categoryId },
 								json: true,
 							},
 						);
@@ -677,8 +670,7 @@ export class Teletype implements INodeType {
 							{
 								method,
 								url,
-								form: { text },
-								headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+								formData: { text },
 								json: true,
 							},
 						);
@@ -731,12 +723,10 @@ export class Teletype implements INodeType {
 						const apiWebhook = this.getNodeParameter('apiWebhook', i) as string;
 						const activeWebhooks = this.getNodeParameter('activeWebhooks', i) as string[];
 
-						// По доке тело: application/json { active_webhooks: [], api_webhook: "..." }
-						// Можно отправлять частично (например только active_webhooks или только api_webhook)
-						const body: Record<string, unknown> = {};
+						const formData: Record<string, unknown> = {};
 						if (Array.isArray(activeWebhooks) && activeWebhooks.length)
-							body.active_webhooks = activeWebhooks;
-						if (apiWebhook) body.api_webhook = apiWebhook;
+							formData.active_webhooks = activeWebhooks;
+						if (apiWebhook) formData.api_webhook = apiWebhook;
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(
 							this,
@@ -744,7 +734,7 @@ export class Teletype implements INodeType {
 							{
 								method,
 								url,
-								body,
+								formData,
 								json: true,
 							},
 						);
