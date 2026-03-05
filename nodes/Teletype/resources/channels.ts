@@ -1,4 +1,4 @@
-import type { INodeProperties } from 'n8n-workflow';
+﻿import type { INodeProperties } from 'n8n-workflow';
 
 export const channelsDescription: INodeProperties[] = [
 	{
@@ -12,13 +12,13 @@ export const channelsDescription: INodeProperties[] = [
 				name: 'List',
 				value: 'list',
 				action: 'List channels',
-				description: 'Получить список каналов в проекте',
+				description: 'РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє РєР°РЅР°Р»РѕРІ РІ РїСЂРѕРµРєС‚Рµ',
 			},
 			{
 				name: 'Send Message',
 				value: 'sendMessage',
 				action: 'Send message via channel',
-				description: 'Отправить сообщение через выбранный канал',
+				description: 'РћС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ С‡РµСЂРµР· РІС‹Р±СЂР°РЅРЅС‹Р№ РєР°РЅР°Р»',
 			},
 		],
 		default: 'list',
@@ -29,7 +29,7 @@ export const channelsDescription: INodeProperties[] = [
 		type: 'number',
 		default: 1,
 		typeOptions: { minValue: 1 },
-		description: 'Номер страницы',
+		description: 'РќРѕРјРµСЂ СЃС‚СЂР°РЅРёС†С‹',
 		displayOptions: { show: { resource: ['channel'], operation: ['list'] } },
 	},
 	{
@@ -38,7 +38,7 @@ export const channelsDescription: INodeProperties[] = [
 		type: 'number',
 		default: 50,
 		typeOptions: { minValue: 1, maxValue: 500 },
-		description: 'Количество элементов на странице',
+		description: 'РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РЅР° СЃС‚СЂР°РЅРёС†Рµ',
 		displayOptions: { show: { resource: ['channel'], operation: ['list'] } },
 	},
 	{
@@ -47,7 +47,7 @@ export const channelsDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'whatsapp',
-		description: 'Необязательный фильтр по типу канала',
+		description: 'РќРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ С„РёР»СЊС‚СЂ РїРѕ С‚РёРїСѓ РєР°РЅР°Р»Р°',
 		displayOptions: { show: { resource: ['channel'], operation: ['list'] } },
 	},
 	{
@@ -55,7 +55,8 @@ export const channelsDescription: INodeProperties[] = [
 		name: 'onlyActive',
 		type: 'boolean',
 		default: true,
-		description: 'Следует ли возвращать только активные каналы',
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
+		description: 'РЎР»РµРґСѓРµС‚ Р»Рё РІРѕР·РІСЂР°С‰Р°С‚СЊ С‚РѕР»СЊРєРѕ Р°РєС‚РёРІРЅС‹Рµ РєР°РЅР°Р»С‹',
 		displayOptions: { show: { resource: ['channel'], operation: ['list'] } },
 	},
 	{
@@ -64,7 +65,7 @@ export const channelsDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		description: 'Идентификатор канала',
+		description: 'РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР°РЅР°Р»Р°',
 		displayOptions: { show: { resource: ['channel'], operation: ['sendMessage'] } },
 	},
 	{
@@ -73,7 +74,7 @@ export const channelsDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		description: 'Текст сообщения',
+		description: 'РўРµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ',
 		displayOptions: { show: { resource: ['channel'], operation: ['sendMessage'] } },
 	},
 	{
@@ -81,8 +82,9 @@ export const channelsDescription: INodeProperties[] = [
 		name: 'autoClose',
 		type: 'boolean',
 		default: false,
+		// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
 		description:
-			'Следует ли закрывать диалоговое окно после отправки сообщения',
+			'РЎР»РµРґСѓРµС‚ Р»Рё Р·Р°РєСЂС‹РІР°С‚СЊ РґРёР°Р»РѕРіРѕРІРѕРµ РѕРєРЅРѕ РїРѕСЃР»Рµ РѕС‚РїСЂР°РІРєРё СЃРѕРѕР±С‰РµРЅРёСЏ',
 		displayOptions: { show: { resource: ['channel'], operation: ['sendMessage'] } },
 	},
 	{
@@ -95,7 +97,7 @@ export const channelsDescription: INodeProperties[] = [
 			{ name: 'Username', value: 'username' },
 		],
 		default: 'phone',
-		description: 'Как указать получателя сообщения',
+		description: 'РљР°Рє СѓРєР°Р·Р°С‚СЊ РїРѕР»СѓС‡Р°С‚РµР»СЏ СЃРѕРѕР±С‰РµРЅРёСЏ',
 		displayOptions: { show: { resource: ['channel'], operation: ['sendMessage'] } },
 	},
 	{
@@ -104,7 +106,7 @@ export const channelsDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: '+79161234567',
-		description: 'Телефон клиента-получателя',
+		description: 'РўРµР»РµС„РѕРЅ РєР»РёРµРЅС‚Р°-РїРѕР»СѓС‡Р°С‚РµР»СЏ',
 		displayOptions: {
 			show: { resource: ['channel'], operation: ['sendMessage'], recipientMode: ['phone'] },
 		},
@@ -115,7 +117,7 @@ export const channelsDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'client@example.com',
-		description: 'Email клиента-получателя',
+		description: 'Email РєР»РёРµРЅС‚Р°-РїРѕР»СѓС‡Р°С‚РµР»СЏ',
 		displayOptions: {
 			show: { resource: ['channel'], operation: ['sendMessage'], recipientMode: ['email'] },
 		},
@@ -126,7 +128,7 @@ export const channelsDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'someuser',
-		description: 'Username клиента-получателя',
+		description: 'Username РєР»РёРµРЅС‚Р°-РїРѕР»СѓС‡Р°С‚РµР»СЏ',
 		displayOptions: {
 			show: { resource: ['channel'], operation: ['sendMessage'], recipientMode: ['username'] },
 		},
@@ -141,7 +143,7 @@ export const channelsDescription: INodeProperties[] = [
 			{ name: 'URL', value: 'url' },
 		],
 		default: 'none',
-		description: 'Отправить файл из binary-входа или по URL; в API файл имеет приоритет над URL',
+		description: 'РћС‚РїСЂР°РІРёС‚СЊ С„Р°Р№Р» РёР· binary-РІС…РѕРґР° РёР»Рё РїРѕ URL; РІ API С„Р°Р№Р» РёРјРµРµС‚ РїСЂРёРѕСЂРёС‚РµС‚ РЅР°Рґ URL',
 		displayOptions: { show: { resource: ['channel'], operation: ['sendMessage'] } },
 	},
 	{
@@ -149,7 +151,7 @@ export const channelsDescription: INodeProperties[] = [
 		name: 'binaryPropertyName',
 		type: 'string',
 		default: 'data',
-		description: 'Имя binary-свойства во входном элементе',
+		description: 'РРјСЏ binary-СЃРІРѕР№СЃС‚РІР° РІРѕ РІС…РѕРґРЅРѕРј СЌР»РµРјРµРЅС‚Рµ',
 		displayOptions: {
 			show: { resource: ['channel'], operation: ['sendMessage'], attachmentMode: ['binary'] },
 		},
@@ -160,7 +162,7 @@ export const channelsDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'https://example.com/file.jpg',
-		description: 'URL файла для отправки',
+		description: 'URL С„Р°Р№Р»Р° РґР»СЏ РѕС‚РїСЂР°РІРєРё',
 		displayOptions: {
 			show: { resource: ['channel'], operation: ['sendMessage'], attachmentMode: ['url'] },
 		},
@@ -170,7 +172,7 @@ export const channelsDescription: INodeProperties[] = [
 		name: 'repliedMessageId',
 		type: 'string',
 		default: '',
-		description: 'ID сообщения, на которое нужно ответить',
+		description: 'ID СЃРѕРѕР±С‰РµРЅРёСЏ, РЅР° РєРѕС‚РѕСЂРѕРµ РЅСѓР¶РЅРѕ РѕС‚РІРµС‚РёС‚СЊ',
 		displayOptions: { show: { resource: ['channel'], operation: ['sendMessage'] } },
 	},
 ];

@@ -11,7 +11,19 @@
 		"api",
 		"crm",
 		"support",
-		"chat"
+		"chat",
+		"whatsapp",
+		"waba",
+		"telegram",
+		"telegram-bot",
+		"max",
+		"instagram",
+		"instagram-comments",
+		"facebook",
+		"vk",
+		"avito",
+		"viber",
+		"email"
 	],
 	"author": {
 		"name": "Teletype",

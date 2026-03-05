@@ -1,7 +1,7 @@
 # n8n-nodes-teletype-app
 **Teletype Public API → n8n Community Nodes**
 
-Набор нод для **n8n**, который подключает **Teletype Public API**: действия (Actions) и триггеры (Triggers) для работы с клиентами/диалогами/сообщениями/каналами.
+Набор нод для **n8n**, который подключает  **Public API** от сервиса [teletype.app](https://teletype.app/?utm_source=n8n) для работы с такими мессенджерами и соц.сетями как WhatApp, WABA, Telegram, Max, Instagram, Facebook, Чат на сайт, VK, Avito, Viber, Email.
 
 ---
 
