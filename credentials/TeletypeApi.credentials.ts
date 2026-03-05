@@ -28,34 +28,17 @@ export class TeletypeApi implements ICredentialType {
 			default: '',
 			description: 'Project token from Teletype (Public API)',
 		},
-		{
-			displayName: 'Auth Mode',
-			name: 'authMode',
-			type: 'options',
-			options: [
-				{ name: 'Header (X-Auth-Token)', value: 'header' },
-				{ name: 'Query (?token=...)', value: 'query' },
-			],
-			default: 'header',
-			description: 'How to send the token to Teletype API',
-		},
 	];
 
 	authenticate: IAuthenticateGeneric = {
 		type: 'generic',
 		properties: {
 			headers: {
-				// Если authMode=header — кладём токен в X-Auth-Token
-				'X-Auth-Token': '={{$credentials.authMode === "header" ? $credentials.token : undefined}}',
-			},
-			qs: {
-				// Если authMode=query — кладём токен в ?token=
-				token: '={{$credentials.authMode === "query" ? $credentials.token : undefined}}',
+				'X-Auth-Token': '={{$credentials.token}}',
 			},
 		},
 	};
 
-	// ✅ Лучший тест: получить детали проекта по токену
 	test: ICredentialTestRequest = {
 		request: {
 			baseURL: '={{$credentials.baseUrl}}',
