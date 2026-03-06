@@ -18,6 +18,114 @@ import { templatesDescription } from './resources/templates';
 import { projectDescription } from './resources/project';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+type MultipartPrimitive = string | number | boolean;
+type MultipartFields = Record<string, MultipartPrimitive | MultipartPrimitive[]>;
+type MultipartFile = {
+	buffer: Buffer;
+	filename: string;
+	contentType: string;
+};
+
+function toUrlEncodedBody(data: Record<string, unknown>): string {
+	const params = new URLSearchParams();
+
+	for (const [key, value] of Object.entries(data)) {
+		if (value === undefined || value === null) continue;
+
+		if (Array.isArray(value)) {
+			for (const item of value) {
+				if (item === undefined || item === null) continue;
+				params.append(key, String(item));
+			}
+			continue;
+		}
+
+		params.append(key, String(value));
+	}
+
+	return params.toString();
+}
+
+function extractMultipartParts(formData: Record<string, unknown>): {
+	fields: MultipartFields;
+	file?: MultipartFile;
+} {
+	const fields: MultipartFields = {};
+	let file: MultipartFile | undefined;
+
+	for (const [key, value] of Object.entries(formData)) {
+		if (value === undefined || value === null) continue;
+
+		if (key === 'file' && typeof value === 'object' && value !== null) {
+			const fileCandidate = value as {
+				value?: unknown;
+				options?: { filename?: string; contentType?: string };
+			};
+			if (Buffer.isBuffer(fileCandidate.value)) {
+				file = {
+					buffer: fileCandidate.value,
+					filename: fileCandidate.options?.filename || 'attachment',
+					contentType: fileCandidate.options?.contentType || 'application/octet-stream',
+				};
+				continue;
+			}
+		}
+
+		if (Array.isArray(value)) {
+			fields[key] = value.map((item) => String(item));
+			continue;
+		}
+
+		if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+			fields[key] = value;
+			continue;
+		}
+
+		fields[key] = String(value);
+	}
+
+	return { fields, file };
+}
+
+async function sendMultipartRequest(
+	url: string,
+	token: string,
+	fields: MultipartFields,
+	file?: MultipartFile,
+): Promise<unknown> {
+	const body = new FormData();
+
+	for (const [key, value] of Object.entries(fields)) {
+		if (Array.isArray(value)) {
+			for (const item of value) {
+				body.append(key, String(item));
+			}
+			continue;
+		}
+		body.append(key, String(value));
+	}
+
+	if (file) {
+		const blob = new Blob([file.buffer], { type: file.contentType });
+		body.append('file', blob, file.filename);
+	}
+
+	const response = await fetch(url, {
+		method: 'POST',
+		headers: {
+			'X-Auth-Token': token,
+			Accept: 'application/json',
+		},
+		body,
+	});
+
+	const text = await response.text();
+	try {
+		return JSON.parse(text) as unknown;
+	} catch {
+		return text;
+	}
+}
 
 export class Teletype implements INodeType {
 	description: INodeTypeDescription = {
@@ -44,7 +152,6 @@ export class Teletype implements INodeType {
 			baseURL: '={{$credentials.baseUrl || "https://api.teletype.app/public/api/v1"}}',
 			headers: {
 				Accept: 'application/json',
-				'Content-Type': 'application/json',
 			},
 		},
 		properties: [
@@ -86,7 +193,7 @@ export class Teletype implements INodeType {
 		const resource = this.getNodeParameter('resource', 0) as string;
 		const operation = this.getNodeParameter('operation', 0) as string;
 
-		const creds = await this.getCredentials<{ baseUrl: string }>('teletypeApi');
+		const creds = await this.getCredentials<{ baseUrl: string; token: string }>('teletypeApi');
 		const baseUrl = (creds.baseUrl || 'https://api.teletype.app/public/api/v1').replace(/\/+$/, '');
 
 		for (let i = 0; i < items.length; i++) {
@@ -194,10 +301,13 @@ export class Teletype implements INodeType {
 							this,
 							'teletypeApi',
 							{
-								method,
+								method: 'POST',
 								url,
-								formData,
+								body: toUrlEncodedBody(formData),
 								json: true,
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
 							},
 						);
 
@@ -212,24 +322,41 @@ export class Teletype implements INodeType {
 						const clientId = this.getNodeParameter('clientId', i) as string;
 						url = `${baseUrl}/client/set-custom-fields/${encodeURIComponent(clientId)}`;
 
-						const customFields = this.getNodeParameter('customFields', i) as {
-							values?: Array<{ key: string; value: string }>;
-						};
+						const customFields = this.getNodeParameter('customFields', i) as
+							| { values?: Array<{ key?: string; value?: string }> }
+							| Array<{ key?: string; value?: string }>;
+
+						// n8n fixedCollection can be returned in different shapes depending on UI/config.
+						const rows = Array.isArray(customFields)
+							? customFields
+							: Array.isArray(customFields?.values)
+								? customFields.values
+								: [];
 
 						const formData: Record<string, string> = {};
-						for (const row of customFields.values ?? []) {
+						for (const row of rows) {
 							if (!row?.key) continue;
 							formData[`values[${row.key}]`] = row.value ?? '';
 						}
 
+						if (Object.keys(formData).length === 0) {
+							throw new NodeOperationError(
+								this.getNode(),
+								`No custom fields were prepared for request. customFields raw: ${JSON.stringify(customFields)}`,
+								{ itemIndex: i },
+							);
+						}
 						const response = await this.helpers.httpRequestWithAuthentication.call(
 							this,
 							'teletypeApi',
 							{
-								method,
+								method: 'POST',
 								url,
-								formData,
+								body: toUrlEncodedBody(formData),
 								json: true,
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
 							},
 						);
 
@@ -283,10 +410,13 @@ export class Teletype implements INodeType {
 							this,
 							'teletypeApi',
 							{
-								method,
+								method: 'POST',
 								url,
-								formData: { operator_id: operatorId },
+								body: toUrlEncodedBody({ operator_id: operatorId }),
 								json: true,
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
 							},
 						);
 
@@ -297,21 +427,41 @@ export class Teletype implements INodeType {
 						url = `${baseUrl}/dialog/create`;
 
 						const channelId = this.getNodeParameter('createChannelId', i) as string;
-						const clientPhone = this.getNodeParameter('createClientPhone', i) as string;
-						const clientEmail = this.getNodeParameter('createClientEmail', i) as string;
+						const clientIdentifierMode = this.getNodeParameter(
+							'createClientIdentifierMode',
+							i,
+						) as 'phone' | 'email';
 
 						const formData: Record<string, string> = { channelId };
-						if (clientPhone) formData.clientPhone = clientPhone;
-						if (clientEmail) formData.clientEmail = clientEmail;
+						if (clientIdentifierMode === 'phone') {
+							const clientPhone = this.getNodeParameter('createClientPhone', i) as string;
+							if (!clientPhone?.trim()) {
+								throw new NodeOperationError(this.getNode(), 'Client Phone must not be empty.', {
+									itemIndex: i,
+								});
+							}
+							formData.clientPhone = clientPhone;
+						} else {
+							const clientEmail = this.getNodeParameter('createClientEmail', i) as string;
+							if (!clientEmail?.trim()) {
+								throw new NodeOperationError(this.getNode(), 'Client Email must not be empty.', {
+									itemIndex: i,
+								});
+							}
+							formData.clientEmail = clientEmail;
+						}
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(
 							this,
 							'teletypeApi',
 							{
-								method,
+								method: 'POST',
 								url,
-								formData,
+								body: toUrlEncodedBody(formData),
 								json: true,
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
 							},
 						);
 
@@ -352,6 +502,11 @@ export class Teletype implements INodeType {
 						const text = this.getNodeParameter('text', i) as string;
 						const attachmentMode = this.getNodeParameter('attachmentMode', i) as string;
 						const repliedMessageId = this.getNodeParameter('repliedMessageId', i) as string;
+						const isBinaryAttachment = ['binary', 'binaryFile', 'binary_file', 'file'].includes(
+							attachmentMode,
+						);
+						const isUrlAttachment = ['url', 'fileUrl', 'file_url', 'link'].includes(attachmentMode);
+						let binaryPropertyName: string | undefined;
 
 						method = 'POST';
 						url = `${baseUrl}/message/send`;
@@ -367,13 +522,13 @@ export class Teletype implements INodeType {
 							formData.replied_message_id = repliedMessageId;
 						}
 
-						if (attachmentMode === 'url') {
+						if (isUrlAttachment) {
 							const fileUrl = this.getNodeParameter('fileUrl', i) as string;
 							if (fileUrl) formData.url = fileUrl;
 						}
 
-						if (attachmentMode === 'binary') {
-							const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
+						if (isBinaryAttachment) {
+							binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
 
 							const item = items[i];
 							const binary = item?.binary;
@@ -398,16 +553,21 @@ export class Teletype implements INodeType {
 							};
 						}
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(
-							this,
-							'teletypeApi',
-							{
-								method,
+						let response;
+						if (isBinaryAttachment) {
+							const { fields, file } = extractMultipartParts(formData);
+							response = await sendMultipartRequest(url, creds.token, fields, file);
+						} else {
+							response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
+								method: 'POST',
 								url,
-								formData,
+								body: toUrlEncodedBody(formData),
 								json: true,
-							},
-						);
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
+							});
+						}
 
 						returnData.push({ json: response });
 						continue;
@@ -421,6 +581,11 @@ export class Teletype implements INodeType {
 						const recipientMode = this.getNodeParameter('recipientMode', i) as string;
 						const attachmentMode = this.getNodeParameter('attachmentMode', i) as string;
 						const repliedMessageId = this.getNodeParameter('repliedMessageId', i) as string;
+						const isBinaryAttachment = ['binary', 'binaryFile', 'binary_file', 'file'].includes(
+							attachmentMode,
+						);
+						const isUrlAttachment = ['url', 'fileUrl', 'file_url', 'link'].includes(attachmentMode);
+						let binaryPropertyName: string | undefined;
 
 						const formData: Record<string, unknown> = {
 							channelId,
@@ -443,13 +608,13 @@ export class Teletype implements INodeType {
 							if (clientUsername) formData.clientUsername = clientUsername;
 						}
 
-						if (attachmentMode === 'url') {
+						if (isUrlAttachment) {
 							const fileUrl = this.getNodeParameter('fileUrl', i) as string;
 							if (fileUrl) formData.url = fileUrl;
 						}
 
-						if (attachmentMode === 'binary') {
-							const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
+						if (isBinaryAttachment) {
+							binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
 							const item = items[i];
 							const binary = item?.binary;
 
@@ -472,16 +637,21 @@ export class Teletype implements INodeType {
 							};
 						}
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(
-							this,
-							'teletypeApi',
-							{
-								method,
+						let response;
+						if (isBinaryAttachment) {
+							const { fields, file } = extractMultipartParts(formData);
+							response = await sendMultipartRequest(url, creds.token, fields, file);
+						} else {
+							response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
+								method: 'POST',
 								url,
-								formData,
+								body: toUrlEncodedBody(formData),
 								json: true,
-							},
-						);
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
+							});
+						}
 
 						returnData.push({ json: response });
 						continue;
@@ -514,6 +684,11 @@ export class Teletype implements INodeType {
 						const recipientMode = this.getNodeParameter('recipientMode', i) as string;
 						const attachmentMode = this.getNodeParameter('attachmentMode', i) as string;
 						const repliedMessageId = this.getNodeParameter('repliedMessageId', i) as string;
+						const isBinaryAttachment = ['binary', 'binaryFile', 'binary_file', 'file'].includes(
+							attachmentMode,
+						);
+						const isUrlAttachment = ['url', 'fileUrl', 'file_url', 'link'].includes(attachmentMode);
+						let binaryPropertyName: string | undefined;
 
 						const formData: Record<string, unknown> = {
 							channelId,
@@ -536,13 +711,13 @@ export class Teletype implements INodeType {
 							if (clientUsername) formData.clientUsername = clientUsername;
 						}
 
-						if (attachmentMode === 'url') {
+						if (isUrlAttachment) {
 							const fileUrl = this.getNodeParameter('fileUrl', i) as string;
 							if (fileUrl) formData.url = fileUrl;
 						}
 
-						if (attachmentMode === 'binary') {
-							const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
+						if (isBinaryAttachment) {
+							binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
 
 							const item = items[i];
 							const binary = item?.binary;
@@ -566,16 +741,21 @@ export class Teletype implements INodeType {
 							};
 						}
 
-						const response = await this.helpers.httpRequestWithAuthentication.call(
-							this,
-							'teletypeApi',
-							{
-								method,
+						let response;
+						if (isBinaryAttachment) {
+							const { fields, file } = extractMultipartParts(formData);
+							response = await sendMultipartRequest(url, creds.token, fields, file);
+						} else {
+							response = await this.helpers.httpRequestWithAuthentication.call(this, 'teletypeApi', {
+								method: 'POST',
 								url,
-								formData,
+								body: toUrlEncodedBody(formData),
 								json: true,
-							},
-						);
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
+							});
+						}
 
 						returnData.push({ json: response });
 						continue;
@@ -605,10 +785,13 @@ export class Teletype implements INodeType {
 							this,
 							'teletypeApi',
 							{
-								method, // <- HttpMethod union, ок
+								method: 'POST',
 								url,
-								formData: { tag_id: tagId },
+								body: toUrlEncodedBody({ tag_id: tagId }),
 								json: true,
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
 							},
 						);
 
@@ -635,10 +818,13 @@ export class Teletype implements INodeType {
 							this,
 							'teletypeApi',
 							{
-								method, // <- твой HttpMethod union
+								method: 'POST',
 								url,
-								formData: { category_appointed_id: categoryId },
+								body: toUrlEncodedBody({ category_appointed_id: categoryId }),
 								json: true,
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
 							},
 						);
 
@@ -668,10 +854,13 @@ export class Teletype implements INodeType {
 							this,
 							'teletypeApi',
 							{
-								method,
+								method: 'POST',
 								url,
-								formData: { text },
+								body: toUrlEncodedBody({ text }),
 								json: true,
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
 							},
 						);
 
@@ -725,17 +914,20 @@ export class Teletype implements INodeType {
 
 						const formData: Record<string, unknown> = {};
 						if (Array.isArray(activeWebhooks) && activeWebhooks.length)
-							formData.active_webhooks = activeWebhooks;
+							formData['active_webhooks[]'] = activeWebhooks;
 						if (apiWebhook) formData.api_webhook = apiWebhook;
 
 						const response = await this.helpers.httpRequestWithAuthentication.call(
 							this,
 							'teletypeApi',
 							{
-								method,
+								method: 'POST',
 								url,
-								formData,
+								body: toUrlEncodedBody(formData),
 								json: true,
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded',
+								},
 							},
 						);
 
@@ -781,3 +973,4 @@ export class Teletype implements INodeType {
 		return [returnData];
 	}
 }
+

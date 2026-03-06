@@ -1,4 +1,4 @@
-import type { INodeProperties } from 'n8n-workflow';
+﻿import type { INodeProperties } from 'n8n-workflow';
 
 export const dialogsDescription: INodeProperties[] = [
 	{
@@ -101,21 +101,40 @@ export const dialogsDescription: INodeProperties[] = [
 		displayOptions: { show: { resource: ['dialog'], operation: ['create'] } },
 	},
 	{
+		displayName: 'Client Identifier',
+		name: 'createClientIdentifierMode',
+		type: 'options',
+		options: [
+			{ name: 'Phone', value: 'phone' },
+			{ name: 'Email', value: 'email' },
+		],
+		default: 'phone',
+		description: 'Идентификатор клиента для создания диалога',
+		displayOptions: { show: { resource: ['dialog'], operation: ['create'] } },
+	},
+	{
 		displayName: 'Client Phone',
 		name: 'createClientPhone',
 		type: 'string',
+		required: true,
 		default: '',
 		placeholder: '+79161234567',
 		description: 'Телефон клиента для создания диалога',
-		displayOptions: { show: { resource: ['dialog'], operation: ['create'] } },
+		displayOptions: {
+			show: { resource: ['dialog'], operation: ['create'], createClientIdentifierMode: ['phone'] },
+		},
 	},
 	{
 		displayName: 'Client Email',
 		name: 'createClientEmail',
 		type: 'string',
+		required: true,
 		default: '',
 		placeholder: 'client@example.com',
 		description: 'Email клиента для создания диалога',
-		displayOptions: { show: { resource: ['dialog'], operation: ['create'] } },
+		displayOptions: {
+			show: { resource: ['dialog'], operation: ['create'], createClientIdentifierMode: ['email'] },
+		},
 	},
 ];
+

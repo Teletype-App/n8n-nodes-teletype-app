@@ -1,4 +1,4 @@
-import type { INodeProperties } from 'n8n-workflow';
+﻿import type { INodeProperties } from 'n8n-workflow';
 
 export const messagesDescription: INodeProperties[] = [
 	{
@@ -12,19 +12,19 @@ export const messagesDescription: INodeProperties[] = [
 				name: 'List',
 				value: 'list',
 				action: 'List messages',
-				description: 'Получить список сообщений',
+				description: 'РџРѕР»СѓС‡РёС‚СЊ СЃРїРёСЃРѕРє СЃРѕРѕР±С‰РµРЅРёР№',
 			},
 			{
 				name: 'Send to Dialog',
 				value: 'send',
 				action: 'Send message to dialog',
-				description: 'Отправить сообщение в диалог',
+				description: 'РћС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РІ РґРёР°Р»РѕРі',
 			},
 			{
 				name: 'Send via Channel',
 				value: 'sendMessage',
 				action: 'Send message via channel',
-				description: 'Отправить сообщение через выбранный канал',
+				description: 'РћС‚РїСЂР°РІРёС‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ С‡РµСЂРµР· РІС‹Р±СЂР°РЅРЅС‹Р№ РєР°РЅР°Р»',
 			},
 		],
 		default: 'list',
@@ -35,7 +35,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'number',
 		default: 1,
 		typeOptions: { minValue: 1 },
-		description: 'Номер страницы',
+		description: 'РќРѕРјРµСЂ СЃС‚СЂР°РЅРёС†С‹',
 		displayOptions: { show: { resource: ['message'], operation: ['list'] } },
 	},
 	{
@@ -44,7 +44,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'number',
 		default: 50,
 		typeOptions: { minValue: 1, maxValue: 500 },
-		description: 'Количество элементов на странице',
+		description: 'РљРѕР»РёС‡РµСЃС‚РІРѕ СЌР»РµРјРµРЅС‚РѕРІ РЅР° СЃС‚СЂР°РЅРёС†Рµ',
 		displayOptions: { show: { resource: ['message'], operation: ['list'] } },
 	},
 	{
@@ -52,7 +52,7 @@ export const messagesDescription: INodeProperties[] = [
 		name: 'listDialogId',
 		type: 'string',
 		default: '',
-		description: 'Необязательный фильтр по ID диалога',
+		description: 'РќРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ С„РёР»СЊС‚СЂ РїРѕ ID РґРёР°Р»РѕРіР°',
 		displayOptions: { show: { resource: ['message'], operation: ['list'] } },
 	},
 	{
@@ -60,7 +60,7 @@ export const messagesDescription: INodeProperties[] = [
 		name: 'listChannelId',
 		type: 'string',
 		default: '',
-		description: 'Необязательный фильтр по ID канала',
+		description: 'РќРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ С„РёР»СЊС‚СЂ РїРѕ ID РєР°РЅР°Р»Р°',
 		displayOptions: { show: { resource: ['message'], operation: ['list'] } },
 	},
 	{
@@ -68,7 +68,7 @@ export const messagesDescription: INodeProperties[] = [
 		name: 'listClientId',
 		type: 'string',
 		default: '',
-		description: 'Необязательный фильтр по ID клиента',
+		description: 'РќРµРѕР±СЏР·Р°С‚РµР»СЊРЅС‹Р№ С„РёР»СЊС‚СЂ РїРѕ ID РєР»РёРµРЅС‚Р°',
 		displayOptions: { show: { resource: ['message'], operation: ['list'] } },
 	},
 	{
@@ -77,7 +77,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		description: 'Идентификатор диалога',
+		description: 'РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РґРёР°Р»РѕРіР°',
 		displayOptions: { show: { resource: ['message'], operation: ['send'] } },
 	},
 	{
@@ -86,7 +86,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		description: 'Идентификатор канала',
+		description: 'РРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РєР°РЅР°Р»Р°',
 		displayOptions: { show: { resource: ['message'], operation: ['sendMessage'] } },
 	},
 	{
@@ -95,7 +95,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'boolean',
 		default: false,
 		// eslint-disable-next-line n8n-nodes-base/node-param-description-boolean-without-whether
-		description: 'Следует ли закрывать диалоговое окно после отправки сообщения',
+		description: 'РЎР»РµРґСѓРµС‚ Р»Рё Р·Р°РєСЂС‹РІР°С‚СЊ РґРёР°Р»РѕРіРѕРІРѕРµ РѕРєРЅРѕ РїРѕСЃР»Рµ РѕС‚РїСЂР°РІРєРё СЃРѕРѕР±С‰РµРЅРёСЏ',
 		displayOptions: { show: { resource: ['message'], operation: ['sendMessage'] } },
 	},
 	{
@@ -108,7 +108,7 @@ export const messagesDescription: INodeProperties[] = [
 			{ name: 'Username', value: 'username' },
 		],
 		default: 'phone',
-		description: 'Как указать получателя сообщения',
+		description: 'РљР°Рє СѓРєР°Р·Р°С‚СЊ РїРѕР»СѓС‡Р°С‚РµР»СЏ СЃРѕРѕР±С‰РµРЅРёСЏ',
 		displayOptions: { show: { resource: ['message'], operation: ['sendMessage'] } },
 	},
 	{
@@ -117,7 +117,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: '+79161234567',
-		description: 'Телефон клиента-получателя',
+		description: 'РўРµР»РµС„РѕРЅ РєР»РёРµРЅС‚Р°-РїРѕР»СѓС‡Р°С‚РµР»СЏ',
 		displayOptions: {
 			show: { resource: ['message'], operation: ['sendMessage'], recipientMode: ['phone'] },
 		},
@@ -128,7 +128,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'client@example.com',
-		description: 'Email клиента-получателя',
+		description: 'Email РєР»РёРµРЅС‚Р°-РїРѕР»СѓС‡Р°С‚РµР»СЏ',
 		displayOptions: {
 			show: { resource: ['message'], operation: ['sendMessage'], recipientMode: ['email'] },
 		},
@@ -139,7 +139,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'someuser',
-		description: 'Username клиента-получателя',
+		description: 'Username РєР»РёРµРЅС‚Р°-РїРѕР»СѓС‡Р°С‚РµР»СЏ',
 		displayOptions: {
 			show: { resource: ['message'], operation: ['sendMessage'], recipientMode: ['username'] },
 		},
@@ -150,7 +150,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'string',
 		required: true,
 		default: '',
-		description: 'Текст сообщения',
+		description: 'РўРµРєСЃС‚ СЃРѕРѕР±С‰РµРЅРёСЏ',
 		displayOptions: { show: { resource: ['message'], operation: ['send', 'sendMessage'] } },
 	},
 	{
@@ -164,7 +164,7 @@ export const messagesDescription: INodeProperties[] = [
 		],
 		default: 'none',
 		displayOptions: { show: { resource: ['message'], operation: ['send', 'sendMessage'] } },
-		description: 'Отправить файл из binary-входа или по URL; в API файл имеет приоритет над URL',
+		description: 'РћС‚РїСЂР°РІРёС‚СЊ С„Р°Р№Р» РёР· binary-РІС…РѕРґР° РёР»Рё РїРѕ URL; РІ API С„Р°Р№Р» РёРјРµРµС‚ РїСЂРёРѕСЂРёС‚РµС‚ РЅР°Рґ URL',
 	},
 	{
 		displayName: 'Binary Property',
@@ -179,7 +179,7 @@ export const messagesDescription: INodeProperties[] = [
 				attachmentMode: ['binary'],
 			},
 		},
-		description: 'Имя binary-свойства во входном элементе',
+		description: 'РРјСЏ binary-СЃРІРѕР№СЃС‚РІР° РІРѕ РІС…РѕРґРЅРѕРј СЌР»РµРјРµРЅС‚Рµ',
 	},
 	{
 		displayName: 'File URL',
@@ -187,7 +187,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		placeholder: 'https://example.com/file.jpg',
-		description: 'URL файла для отправки',
+		description: 'URL С„Р°Р№Р»Р° РґР»СЏ РѕС‚РїСЂР°РІРєРё',
 		displayOptions: {
 			show: { resource: ['message'], operation: ['send', 'sendMessage'], attachmentMode: ['url'] },
 		},
@@ -198,6 +198,7 @@ export const messagesDescription: INodeProperties[] = [
 		type: 'string',
 		default: '',
 		displayOptions: { show: { resource: ['message'], operation: ['send', 'sendMessage'] } },
-		description: 'ID сообщения, на которое нужно ответить',
+		description: 'ID СЃРѕРѕР±С‰РµРЅРёСЏ, РЅР° РєРѕС‚РѕСЂРѕРµ РЅСѓР¶РЅРѕ РѕС‚РІРµС‚РёС‚СЊ',
 	},
 ];
+

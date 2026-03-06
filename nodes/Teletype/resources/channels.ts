@@ -175,3 +175,4 @@ export const channelsDescription: INodeProperties[] = [
 		displayOptions: { show: { resource: ['channel'], operation: ['sendMessage'] } },
 	},
 ];
+
